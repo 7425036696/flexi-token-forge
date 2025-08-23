@@ -1,4 +1,4 @@
-import { TokenizerApp } from "@/components/TokenizerApp";
+import  TokenizerApp  from "@/components/TokenizerApp";
 
 const Index = () => {
   return <TokenizerApp />;

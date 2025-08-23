@@ -1,145 +1,95 @@
 import React, { useState, useEffect } from 'react';
-import { Moon, Sun, Zap, Hash, Type, Code, FileCode } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Moon, Sun, Zap } from 'lucide-react';
 import { TokenDisplay } from './TokenDisplay';
 import { TokenStats } from './TokenStats';
 import { EncodingSection } from './EncodingSection';
 import { DecodingSection } from './DecodingSection';
-import { tokenize, encode, getEncodedTokens } from '@/lib/tokenizer';
+import { InputSection } from './InputSection';
+import { TabNavigation } from './TabNavigation';
+import { tokenize, encode, encodeLinewise, getEncodedTokens } from '@/lib/tokenizer';
 
-export function TokenizerApp() {
-  const [text, setText] = useState('Hello world! This is a sample text with numbers like 123 and special characters.');
+export default function TokenizerApp() {
+  const [text, setText] = useState('world the is\nand to of\na in that\nhave i it\nfor not on\nwith he as\nyou do at\nthis but his\nby from they');
   const [isDark, setIsDark] = useState(true);
-  const [tokens, setTokens] = useState<any[]>([]);
-  const [encodedTokens, setEncodedTokens] = useState<any[]>([]);
-  const [tokenIds, setTokenIds] = useState<number[]>([]);
-
-  useEffect(() => {
-    const root = document.documentElement;
-    if (isDark) {
-      root.classList.remove('light');
-    } else {
-      root.classList.add('light');
-    }
-  }, [isDark]);
+  const [tokens, setTokens] = useState([]);
+  const [encodedTokens, setEncodedTokens] = useState([]);
+  const [tokenIds, setTokenIds] = useState([]);
+  const [linewiseTokenIds, setLinewiseTokenIds] = useState([]);
+  const [activeTab, setActiveTab] = useState<'tokens' | 'encoding' | 'decoding'>('tokens');
 
   useEffect(() => {
     const tokenizedResult = tokenize(text);
     const encodedResult = getEncodedTokens(text);
     const ids = encode(text);
-    
+    const linewiseIds = encodeLinewise(text);
+
     setTokens(tokenizedResult);
     setEncodedTokens(encodedResult);
     setTokenIds(ids);
+    setLinewiseTokenIds(linewiseIds);
   }, [text]);
 
   const toggleTheme = () => {
     setIsDark(!isDark);
   };
 
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'tokens':
+        return <TokenDisplay tokens={tokens} linewiseTokenIds={linewiseTokenIds} />;
+      case 'encoding':
+        return <EncodingSection encodedTokens={encodedTokens} tokenIds={tokenIds} linewiseTokenIds={linewiseTokenIds} />;
+      case 'decoding':
+        return <DecodingSection />;
+      default:
+        return <TokenDisplay tokens={tokens} linewiseTokenIds={linewiseTokenIds} />;
+    }
+  };
+
   return (
-    <div className="min-h-screen p-4 md:p-8">
-      <div className="max-w-6xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="text-center space-y-4">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-3">
-              <div className="p-3 rounded-xl glow-effect bg-gradient-primary">
-                <Zap className="h-8 w-8 text-white" />
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -inset-10 opacity-20">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
+          <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-2000"></div>
+          <div className="absolute bottom-1/4 left-1/3 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-4000"></div>
+        </div>
+      </div>
+
+      <div className="relative z-10 p-6 md:p-8">
+        <div className="max-w-7xl mx-auto space-y-8">
+          <div className="text-center space-y-6">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl blur-lg opacity-50"></div>
+                  <div className="relative p-4 rounded-2xl bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30">
+                    <Zap className="h-10 w-10 text-blue-400" />
+                  </div>
+                </div>
+                <div>
+                  <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    TokenMaster
+                  </h1>
+                  <p className="text-slate-400 text-xl">
+                    Advanced Text Tokenization Engine
+                  </p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-4xl md:text-5xl font-bold gradient-text">
-                  TokenMaster
-                </h1>
-                <p className="text-muted-foreground text-lg">
-                  Advanced Text Tokenization Engine
-                </p>
-              </div>
+              
             </div>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={toggleTheme}
-              className="h-12 w-12 rounded-xl"
-            >
-              {isDark ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
-            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <InputSection text={text} setText={setText} tokens={tokens} />
+            <TokenStats tokens={tokens} />
+          </div>
+
+          <div className="w-full">
+            <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
+            {renderTabContent()}
           </div>
         </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Input Section */}
-          <Card className="glass-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Type className="h-5 w-5 text-primary" />
-                Input Text
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Textarea
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder="Enter your text here to tokenize..."
-                className="min-h-[200px] resize-none text-base"
-              />
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="secondary" className="flex items-center gap-1">
-                  <Hash className="h-3 w-3" />
-                  {text.length} characters
-                </Badge>
-                <Badge variant="secondary">
-                  {text.split(/\s+/).filter(w => w.length > 0).length} words
-                </Badge>
-                <Badge variant="secondary" className="flex items-center gap-1">
-                  <Code className="h-3 w-3" />
-                  {tokens.length} tokens
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Stats Section */}
-          <TokenStats tokens={tokens} />
-        </div>
-
-        {/* Tabbed Content */}
-        <Tabs defaultValue="tokens" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="tokens" className="flex items-center gap-2">
-              <Type className="h-4 w-4" />
-              Tokenization
-            </TabsTrigger>
-            <TabsTrigger value="encoding" className="flex items-center gap-2">
-              <Code className="h-4 w-4" />
-              Encoding
-            </TabsTrigger>
-            <TabsTrigger value="decoding" className="flex items-center gap-2">
-              <FileCode className="h-4 w-4" />
-              Decoding
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="tokens" className="mt-6">
-            <TokenDisplay tokens={tokens} />
-          </TabsContent>
-          
-          <TabsContent value="encoding" className="mt-6">
-            <EncodingSection encodedTokens={encodedTokens} tokenIds={tokenIds} />
-          </TabsContent>
-          
-          <TabsContent value="decoding" className="mt-6">
-            <DecodingSection />
-          </TabsContent>
-        </Tabs>
       </div>
     </div>
   );

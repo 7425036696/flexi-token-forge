@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { FileCode, ArrowRight, RotateCcw } from 'lucide-react';
-import { decode } from '@/lib/tokenizer';
+import { decodeFromIds } from '@/lib/tokenizer';
 
 export function DecodingSection() {
   const [tokenIds, setTokenIds] = useState('');
@@ -13,30 +13,35 @@ export function DecodingSection() {
   const handleDecode = () => {
     try {
       setError('');
-      
-      // Parse the input as JSON array or comma-separated values
-      let ids: number[];
-      
+      let ids;
+
       const trimmed = tokenIds.trim();
       if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
-        // JSON array format
-        ids = JSON.parse(trimmed);
+        try {
+          ids = JSON.parse(trimmed);
+          if (!Array.isArray(ids)) {
+            throw new Error('Input must be an array');
+          }
+          // Handle nested array for linewise decoding
+          if (ids.length > 0 && Array.isArray(ids[0])) {
+            ids = ids.flat(); // Flatten for single-line decoding
+          }
+        } catch (e) {
+          throw new Error('Invalid JSON format. Use [1,2,3] or [[1,2],[3,4]]');
+        }
       } else {
-        // Comma-separated format
         ids = trimmed.split(',').map(id => parseInt(id.trim()));
       }
-      
-      // Validate that all values are numbers
+
       if (ids.some(id => isNaN(id))) {
         setError('Please enter valid token IDs (numbers only)');
         return;
       }
-      
-      const decoded = decode(ids);
+
+      const decoded = decodeFromIds(ids);
       setDecodedText(decoded);
-      
     } catch (err) {
-      setError('Invalid format. Use [1,2,3] or 1,2,3');
+      setError(err.message || 'Invalid format. Use [1,2,3] or 1,2,3');
       setDecodedText('');
     }
   };
@@ -47,7 +52,7 @@ export function DecodingSection() {
     setError('');
   };
 
-  const exampleIds = '[142, 256, 89, 445, 12, 678]';
+  const exampleIds = '[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]';
 
   return (
     <Card className="encoding-card">

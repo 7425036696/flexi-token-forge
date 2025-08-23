@@ -1,110 +1,106 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Code, Copy, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
-interface EncodedToken {
-  id: number;
-  originalText: string;
-  type: 'common' | 'special' | 'number' | 'punctuation' | 'default';
-}
-
-interface EncodingSectionProps {
-  encodedTokens: EncodedToken[];
-  tokenIds: number[];
-}
-
-export function EncodingSection({ encodedTokens, tokenIds }: EncodingSectionProps) {
+export function EncodingSection({ encodedTokens, tokenIds, linewiseTokenIds }) {
   const [copied, setCopied] = useState(false);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(JSON.stringify(tokenIds));
+    navigator.clipboard.writeText(JSON.stringify(linewiseTokenIds));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   if (encodedTokens.length === 0) {
     return (
-      <Card className="encoding-card">
-        <CardContent className="py-16 text-center text-muted-foreground">
-          <Code className="h-12 w-12 mx-auto mb-4 opacity-50" />
-          <p>Enter text to see the encoded representation!</p>
-        </CardContent>
-      </Card>
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900/50 to-slate-800/50 border border-slate-700/50 backdrop-blur-sm">
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-pink-500/5"></div>
+        <div className="relative py-20 text-center text-slate-400">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-pink-500/20 mb-6">
+            <Code className="h-8 w-8 text-indigo-400" />
+          </div>
+          <p className="text-lg font-medium">Enter text to see the encoded representation!</p>
+          <p className="text-sm mt-2 opacity-70">View how your tokens are converted to numerical IDs</p>
+        </div>
+      </div>
     );
   }
 
   return (
-    <Card className="encoding-card">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Code className="h-5 w-5 text-token-encoding" />
-            Encoded Tokens
-          </CardTitle>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={copyToClipboard}
-            className="flex items-center gap-2"
-          >
-            {copied ? (
-              <Check className="h-4 w-4" />
-            ) : (
-              <Copy className="h-4 w-4" />
-            )}
-            {copied ? 'Copied!' : 'Copy IDs'}
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Token ID Array */}
-        <div className="p-4 rounded-lg bg-muted/50 border">
-          <div className="text-sm font-medium mb-2 text-token-encoding">
-            Token IDs Array:
+    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900/50 to-slate-800/50 border border-slate-700/50 backdrop-blur-sm">
+      <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-pink-500/5"></div>
+      <div className="relative p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-500/20 to-pink-500/20">
+              <Code className="h-5 w-5 text-indigo-400" />
+            </div>
+            <h3 className="text-xl font-bold text-white">Encoded Tokens</h3>
           </div>
-          <div className="font-mono text-sm break-all text-muted-foreground">
+          <button
+            onClick={copyToClipboard}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-500/20 to-pink-500/20 border border-indigo-500/30 text-indigo-300 hover:from-indigo-500/30 hover:to-pink-500/30 transition-all duration-200"
+          >
+            {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            {copied ? 'Copied!' : 'Copy Linewise IDs'}
+          </button>
+        </div>
+
+        <div className="p-4 rounded-xl bg-gradient-to-r from-slate-800/50 to-slate-700/50 border border-slate-600/50 mb-6">
+          <div className="text-sm font-semibold mb-3 text-indigo-300">
+            Linewise Token IDs:
+          </div>
+          <div className="font-mono text-sm break-all text-slate-300 bg-black/30 p-3 rounded-lg">
+            {JSON.stringify(linewiseTokenIds)}
+          </div>
+        </div>
+
+        <div className="p-4 rounded-xl bg-gradient-to-r from-slate-800/50 to-slate-700/50 border border-slate-600/50 mb-6">
+          <div className="text-sm font-semibold mb-3 text-indigo-300">
+            Single-line Token IDs:
+          </div>
+          <div className="font-mono text-sm break-all text-slate-300 bg-black/30 p-3 rounded-lg">
             [{tokenIds.join(', ')}]
           </div>
         </div>
 
-        {/* Individual Encoded Tokens */}
-        <div className="space-y-2">
-          <div className="text-sm font-medium mb-3">Token Mappings:</div>
-          <div className="grid gap-2">
+        <div className="space-y-3">
+          <div className="text-sm font-semibold mb-4 text-white">Token Mappings:</div>
+          <div className="max-h-96 overflow-y-auto space-y-2 pr-2">
             {encodedTokens.map((token, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-token-encoding/20"
+                className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-slate-800/30 to-slate-700/30 border border-slate-600/30 hover:from-slate-800/50 hover:to-slate-700/50 transition-all duration-200"
               >
-                <div className="flex items-center gap-3">
-                  <Badge 
-                    variant="secondary" 
-                    className="font-mono text-token-encoding border-token-encoding/30"
-                  >
+                <div className="flex items-center gap-4">
+                  <div className="px-3 py-1 rounded-lg bg-gradient-to-r from-indigo-500/20 to-pink-500/20 border border-indigo-500/30 font-mono text-indigo-300 font-semibold">
                     {token.id}
-                  </Badge>
-                  <span className="text-sm">→</span>
-                  <span className="font-medium">{token.originalText}</span>
+                  </div>
+                  <span className="text-slate-400">→</span>
+                  <span className="font-semibold text-white truncate max-w-xs" title={token.originalText}>
+                    {token.originalText}
+                  </span>
                 </div>
-                <Badge 
-                  variant="outline" 
-                  className={`text-xs ${
-                    token.type === 'special' ? 'border-token-special/50 text-token-special' :
-                    token.type === 'common' ? 'border-token-common/50 text-token-common' :
-                    token.type === 'number' ? 'border-token-number/50 text-token-number' :
-                    token.type === 'punctuation' ? 'border-token-punctuation/50 text-token-punctuation' :
-                    'border-token-default/50 text-token-default'
-                  }`}
-                >
+                <div className={`px-3 py-1 rounded-lg text-xs font-semibold shrink-0 ${
+                  token.type === 'special' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30' :
+                  token.type === 'common' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
+                  token.type === 'number' ? 'bg-green-500/20 text-green-300 border border-green-500/30' :
+                  token.type === 'punctuation' ? 'bg-orange-500/20 text-orange-300 border border-orange-500/30' :
+                  token.type === 'whitespace' ? 'bg-gray-500/20 text-gray-300 border border-gray-500/30' :
+                  'bg-slate-500/20 text-slate-300 border border-slate-500/30'
+                }`}>
                   {token.type}
-                </Badge>
+                </div>
               </div>
             ))}
           </div>
         </div>
-      </CardContent>
-    </Card>
+
+        <div className="pt-6 border-t border-slate-600/50 mt-6">
+          <div className="text-xs text-slate-400 bg-slate-800/30 p-3 rounded-lg">
+            <strong className="text-indigo-400">💡 Tip:</strong> Linewise encoding splits input by lines. Copy the array above to use in the decoder!
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
