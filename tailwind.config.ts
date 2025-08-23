@@ -67,17 +67,21 @@ export default {
 					special: 'hsl(var(--token-special))',
 					number: 'hsl(var(--token-number))',
 					punctuation: 'hsl(var(--token-punctuation))',
-					default: 'hsl(var(--token-default))'
+					default: 'hsl(var(--token-default))',
+					encoding: 'hsl(var(--token-encoding))'
 				}
 			},
 			backgroundImage: {
 				'gradient-primary': 'var(--gradient-primary)',
 				'gradient-secondary': 'var(--gradient-secondary)',
-				'gradient-accent': 'var(--gradient-accent)'
+				'gradient-accent': 'var(--gradient-accent)',
+				'gradient-encoding': 'var(--gradient-encoding)',
+				'gradient-card': 'var(--gradient-card)'
 			},
 			boxShadow: {
 				'glow': 'var(--shadow-glow)',
-				'card': 'var(--shadow-card)'
+				'card': 'var(--shadow-card)',
+				'encoding': 'var(--shadow-encoding)'
 			},
 			transitionTimingFunction: {
 				'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)',

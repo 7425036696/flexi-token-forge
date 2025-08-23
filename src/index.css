@@ -39,21 +39,25 @@ All colors MUST be HSL.
 
     --radius: 0.75rem;
 
-    /* Custom tokenizer colors */
-    --token-common: 142 71% 45%;
-    --token-special: 47 96% 53%;
-    --token-number: 217 91% 60%;
-    --token-punctuation: 330 81% 60%;
-    --token-default: 210 40% 70%;
+    /* Enhanced tokenizer colors - better combinations */
+    --token-common: 158 64% 52%;     /* Emerald green */
+    --token-special: 45 93% 58%;     /* Bright orange */
+    --token-number: 217 91% 60%;     /* Blue */
+    --token-punctuation: 280 100% 70%; /* Purple */
+    --token-default: 220 14% 71%;    /* Cool gray */
+    --token-encoding: 195 100% 50%;  /* Cyan for encoded tokens */
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(263 70% 50%), hsl(280 100% 70%));
-    --gradient-secondary: linear-gradient(135deg, hsl(240 10% 3.9%), hsl(240 5.9% 10%));
-    --gradient-accent: linear-gradient(135deg, hsl(142 71% 45%), hsl(158 64% 52%));
+    /* Beautiful gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(280 100% 70%), hsl(45 93% 58%));
+    --gradient-secondary: linear-gradient(135deg, hsl(240 10% 3.9%), hsl(240 8% 8%));
+    --gradient-accent: linear-gradient(135deg, hsl(158 64% 52%), hsl(195 100% 50%));
+    --gradient-encoding: linear-gradient(135deg, hsl(195 100% 50%), hsl(217 91% 60%));
+    --gradient-card: linear-gradient(135deg, hsl(240 10% 3.9% / 0.8), hsl(240 8% 8% / 0.9));
 
-    /* Shadows */
-    --shadow-glow: 0 0 40px hsl(263 70% 50% / 0.3);
-    --shadow-card: 0 10px 30px -10px hsl(0 0% 0% / 0.3);
+    /* Enhanced shadows */
+    --shadow-glow: 0 0 50px hsl(280 100% 70% / 0.4);
+    --shadow-card: 0 20px 40px -10px hsl(0 0% 0% / 0.4);
+    --shadow-encoding: 0 0 30px hsl(195 100% 50% / 0.3);
 
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -147,11 +151,26 @@ All colors MUST be HSL.
     border: 1px solid hsl(var(--token-default) / 0.3);
   }
 
+  .token-encoding {
+    background: hsl(var(--token-encoding) / 0.2);
+    color: hsl(var(--token-encoding));
+    border: 1px solid hsl(var(--token-encoding) / 0.3);
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-weight: 600;
+  }
+
   .glass-card {
     @apply backdrop-blur-xl border;
-    background: hsl(var(--card) / 0.8);
-    border-color: hsl(var(--border) / 0.5);
+    background: var(--gradient-card);
+    border-color: hsl(var(--border) / 0.6);
     box-shadow: var(--shadow-card);
+  }
+
+  .encoding-card {
+    @apply backdrop-blur-xl border;
+    background: linear-gradient(135deg, hsl(195 100% 50% / 0.1), hsl(217 91% 60% / 0.1));
+    border-color: hsl(195 100% 50% / 0.3);
+    box-shadow: var(--shadow-encoding);
   }
 
   .glow-effect {

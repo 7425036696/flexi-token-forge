@@ -1,17 +1,22 @@
 import { useState, useEffect } from 'react';
-import { Moon, Sun, Zap, Hash, Type } from 'lucide-react';
+import { Moon, Sun, Zap, Hash, Type, Code, FileCode } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TokenDisplay } from './TokenDisplay';
 import { TokenStats } from './TokenStats';
-import { tokenize } from '@/lib/tokenizer';
+import { EncodingSection } from './EncodingSection';
+import { DecodingSection } from './DecodingSection';
+import { tokenize, encode, getEncodedTokens } from '@/lib/tokenizer';
 
 export function TokenizerApp() {
   const [text, setText] = useState('Hello world! This is a sample text with numbers like 123 and special characters.');
   const [isDark, setIsDark] = useState(true);
   const [tokens, setTokens] = useState<any[]>([]);
+  const [encodedTokens, setEncodedTokens] = useState<any[]>([]);
+  const [tokenIds, setTokenIds] = useState<number[]>([]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -24,7 +29,12 @@ export function TokenizerApp() {
 
   useEffect(() => {
     const tokenizedResult = tokenize(text);
+    const encodedResult = getEncodedTokens(text);
+    const ids = encode(text);
+    
     setTokens(tokenizedResult);
+    setEncodedTokens(encodedResult);
+    setTokenIds(ids);
   }, [text]);
 
   const toggleTheme = () => {
@@ -89,6 +99,10 @@ export function TokenizerApp() {
                 <Badge variant="secondary">
                   {text.split(/\s+/).filter(w => w.length > 0).length} words
                 </Badge>
+                <Badge variant="secondary" className="flex items-center gap-1">
+                  <Code className="h-3 w-3" />
+                  {tokens.length} tokens
+                </Badge>
               </div>
             </CardContent>
           </Card>
@@ -97,8 +111,35 @@ export function TokenizerApp() {
           <TokenStats tokens={tokens} />
         </div>
 
-        {/* Token Display */}
-        <TokenDisplay tokens={tokens} />
+        {/* Tabbed Content */}
+        <Tabs defaultValue="tokens" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="tokens" className="flex items-center gap-2">
+              <Type className="h-4 w-4" />
+              Tokenization
+            </TabsTrigger>
+            <TabsTrigger value="encoding" className="flex items-center gap-2">
+              <Code className="h-4 w-4" />
+              Encoding
+            </TabsTrigger>
+            <TabsTrigger value="decoding" className="flex items-center gap-2">
+              <FileCode className="h-4 w-4" />
+              Decoding
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="tokens" className="mt-6">
+            <TokenDisplay tokens={tokens} />
+          </TabsContent>
+          
+          <TabsContent value="encoding" className="mt-6">
+            <EncodingSection encodedTokens={encodedTokens} tokenIds={tokenIds} />
+          </TabsContent>
+          
+          <TabsContent value="decoding" className="mt-6">
+            <DecodingSection />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
